@@ -1,8 +1,6 @@
 package com.baeldung.grpc.client;
 
-import com.baeldung.grpc.HelloRequest;
-import com.baeldung.grpc.HelloResponse;
-import com.baeldung.grpc.HelloServiceGrpc;
+import com.baeldung.grpc.*;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -22,6 +20,10 @@ public class GrpcClient {
             .build());
 
         System.out.println("Response received from server:\n" + helloResponse);
+
+        catalogServiceGrpc.catalogServiceBlockingStub stub2 = catalogServiceGrpc.newBlockingStub(channel);
+        catalogResponse response = stub2.queryCatalog(catalogRequest.newBuilder().setProductCode("x3drf").setProductVersion("v1").build());
+        System.out.println("Response received from server for query catalog :\n" + response);
 
         channel.shutdown();
     }

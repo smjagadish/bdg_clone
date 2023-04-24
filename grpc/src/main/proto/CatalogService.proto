@@ -1,0 +1,18 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.baeldung.grpc;
+
+message catalogRequest {
+  string productVersion = 1;
+  string productCode = 2;
+}
+
+message catalogResponse {
+  bool response = 1;
+  bool valid=2;
+  bool retry_needed=3;
+}
+
+service catalogService {
+  rpc queryCatalog(catalogRequest) returns (catalogResponse);
+}

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package order;
+
+option java_multiple_files = true;
+option java_package = "com.baeldung.grpc.order";
+option java_outer_classname = "orderServiceProto";
+option objc_class_prefix = "RTG";
+
+service orderServiceProvider {
+
+  rpc serverSideStreamingGetOrders(Order) returns (stream ProcessOrder) {}
+
+  rpc clientSideStreamingCreateOrders(stream Order) returns (ProcessOrder) {}
+
+  rpc bidirectionalStreamingPoolOrders(stream Order) returns (stream ProcessOrder) {}
+}
+
+message Order {
+  string product_code = 1;
+  string product_name = 2;
+  int32 product_qty = 3;
+  double price = 4;
+  info product_info = 5;
+}
+
+message ProcessOrder {
+  string status = 1;
+  int32 inv_qty = 2;
+  pinfo info = 3;
+}
+
+message info {
+  string product_type = 1;
+  string product_batch = 2;
+}
+
+message pinfo {
+  string promo_code = 1;
+  bool in_demand = 2;
+}
