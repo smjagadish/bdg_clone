@@ -2,25 +2,88 @@ package com.baeldung.grpc.client;
 
 import com.baeldung.grpc.*;
 
+import com.google.protobuf.Any;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.rpc.Status;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.StatusRuntimeException;
+import io.grpc.protobuf.ProtoUtils;
+import io.grpc.protobuf.StatusProto;
+
+import java.util.Set;
 
 public class GrpcClient {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, InvalidProtocolBufferException {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
             .usePlaintext()
             .build();
 
         HelloServiceGrpc.HelloServiceBlockingStub stub 
           = HelloServiceGrpc.newBlockingStub(channel);
-
-        HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
+try {
+    // below invocation will result in the server raising an exception without any metadata
+    HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
             .setFirstName("Baeldung")
             .setLastName("gRPC")
             .build());
 
-        System.out.println("Response received from server:\n" + helloResponse);
+    System.out.println("Response received from server:\n" + helloResponse);
 
+}
+catch (StatusRuntimeException e)
+{
+ System.out.println("errored due to exception"+" "+e.getMessage()+" "+"and status is"+e.getStatus());
+}
+
+try {
+    // below invocation will result in the server raising an exception with metadata
+    HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
+            .setFirstName("Bang")
+            .setLastName("gRPC")
+            .build());
+}
+catch (StatusRuntimeException e)
+{
+    System.out.println("errored due to exception"+" "+e.getMessage()+" "+"and status is"+e.getStatus());
+    // get the trailing metadata first
+    Metadata trailers = e.getTrailers();
+    // get key info
+    Set<String> eset = trailers.keys();
+
+    for (String key:eset)
+    {
+        // for each key get corresponding md
+        Metadata.Key<String> k = Metadata.Key.of(key,Metadata.ASCII_STRING_MARSHALLER);
+        // retrieve data
+        System.out.println("error med"+" "+trailers.get(k));
+
+    }
+}
+try
+{
+       // below invocation will result in server raising exception using google rpc impl with custom metadata
+    HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
+            .setFirstName("Big")
+            .setLastName("gRPC")
+            .build());
+}
+catch (StatusRuntimeException e)
+{
+    // different technique to get the google status object
+    Status status = StatusProto.fromThrowable(e);
+    System.out.println("google rpc exception with "+ " "+status.getCode() + "and message"+" "+status.getMessage());
+    HelloError er = null;
+    for (Any any : status.getDetailsList())
+    {
+        if(!(any.is(HelloError.class)))
+            continue;
+        er = any.unpack(HelloError.class);
+     System.out.println("extra info"+" "+er.getAddError());
+
+    }
+}
         catalogServiceGrpc.catalogServiceBlockingStub stub2 = catalogServiceGrpc.newBlockingStub(channel);
         catalogResponse response = stub2.queryCatalog(catalogRequest.newBuilder().setProductCode("x3drf").setProductVersion("v1").build());
         System.out.println("Response received from server for query catalog :\n" + response);

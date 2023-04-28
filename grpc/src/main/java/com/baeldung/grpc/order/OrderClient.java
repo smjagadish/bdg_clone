@@ -1,5 +1,6 @@
 package com.baeldung.grpc.order;
 
+import com.google.rpc.Status;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -87,6 +88,7 @@ finishLatch.countDown();
             @Override
             public void onError(Throwable t) {
                 bidi_latch.countDown();
+
 
             }
 

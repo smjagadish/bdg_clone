@@ -39,3 +39,8 @@ message pinfo {
   string promo_code = 1;
   bool in_demand = 2;
 }
+
+message OrderError {
+  string desc = 1;
+  string misc_info = 2;
+}

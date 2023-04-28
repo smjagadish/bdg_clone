@@ -14,3 +14,7 @@ message HelloResponse {
 service HelloService {
     rpc hello(HelloRequest) returns (HelloResponse);
 }
+
+message HelloError {
+    string add_error = 1;
+}
