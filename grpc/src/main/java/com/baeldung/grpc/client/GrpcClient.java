@@ -4,6 +4,7 @@ import com.baeldung.grpc.*;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.rpc.ErrorInfo;
 import com.google.rpc.Status;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -84,6 +85,29 @@ catch (StatusRuntimeException e)
 
     }
 }
+
+try
+{
+    // below invocation will trigger google rpc error handling with prop error model
+    HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
+            .setFirstName("Beg")
+            .setLastName("gRPC")
+            .build());
+}
+catch (StatusRuntimeException e)
+{
+    Status status = StatusProto.fromThrowable(e);
+    System.out.println("google rpc exception for prop data with "+ " "+status.getCode() + "and message"+" "+status.getMessage());
+    for ( Any any : status.getDetailsList())
+    {
+        if(!(any.is(ErrorInfo.class)))
+            continue;
+        ErrorInfo einfo = any.unpack(ErrorInfo.class);
+        System.out.println("extra info for prop data "+ " "+einfo.getDomain()+" "+einfo.getMetadataMap().get("k1"));
+    }
+}
+
+
         catalogServiceGrpc.catalogServiceBlockingStub stub2 = catalogServiceGrpc.newBlockingStub(channel);
         catalogResponse response = stub2.queryCatalog(catalogRequest.newBuilder().setProductCode("x3drf").setProductVersion("v1").build());
         System.out.println("Response received from server for query catalog :\n" + response);

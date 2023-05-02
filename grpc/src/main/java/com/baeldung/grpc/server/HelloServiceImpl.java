@@ -8,10 +8,14 @@ import com.baeldung.grpc.HelloServiceGrpc.HelloServiceImplBase;
 import com.baeldung.grpc.errorhandling.AdditionalError;
 import com.google.protobuf.Any;
 import com.google.rpc.Code;
+import com.google.rpc.ErrorInfo;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
+
+import java.util.Collections;
+import java.util.HashMap;
 
 public class HelloServiceImpl extends HelloServiceImplBase {
 
@@ -72,6 +76,24 @@ public class HelloServiceImpl extends HelloServiceImplBase {
                     .addDetails(Any.pack(er))
                     .build();
             // slightly different technique to convert google rpc error into exception
+            responseObserver.onError(StatusProto.toStatusException(status));
+        }
+
+        // google grpc error handling with proprietary metadata
+
+        if(request.getFirstName().equalsIgnoreCase("Beg"))
+        {
+            // placeholder proto object built using the prop model
+            ErrorInfo einfo = ErrorInfo.newBuilder()
+                    .setReason("prop error")
+                    .setDomain("DMT")
+                    .putAllMetadata(Collections.singletonMap("k1","val1"))
+                    .build();
+            com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
+                    .setCode(Code.INTERNAL_VALUE)
+                    .setMessage("prop data ")
+                    .addDetails(Any.pack(einfo))
+                    .build();
             responseObserver.onError(StatusProto.toStatusException(status));
         }
         responseObserver.onNext(response);
