@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package sample;
+
+option java_multiple_files = true;
+option java_package = "com.baeldung.grpc.sample";
+option java_outer_classname = "sampleServiceProto";
+
+service sampleQuery {
+
+  rpc unarySampleQuery(sampleReqDS) returns (sampleResDS);
+}
+
+message sampleReqDS {
+  int32 serial_num = 1;
+  string req_item = 2;
+}
+
+message successResponse {
+  int32 ack_num = 1;
+  string status = 2;
+}
+
+message errorResponse {
+errorCode code = 1;
+string desc = 2;
+}
+
+enum errorCode {
+   PRD_UNAVL = 0;
+   PRD_INC = 1;
+
+}
+
+message sampleResDS {
+  oneof resp{
+    successResponse sresp = 1;
+    errorResponse eresp = 2;
+  }
+}
