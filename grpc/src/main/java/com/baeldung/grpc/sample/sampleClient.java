@@ -13,6 +13,9 @@ public class sampleClient {
                 .setReqItem("blades")
                 .build();
         sampleQueryGrpc.sampleQueryBlockingStub stub = sampleQueryGrpc.newBlockingStub(channel);
+        sampleQueryGrpc.sampleQueryStub asyncstub = sampleQueryGrpc.newStub(channel);
+        asyncstub.unarySampleQuery(reqDS,new sampleClientAsync());
+
         sampleResDS resDS = stub.unarySampleQuery(reqDS);
         switch(resDS.getRespCase())
         {
