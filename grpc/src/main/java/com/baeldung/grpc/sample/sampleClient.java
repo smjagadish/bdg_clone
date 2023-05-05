@@ -8,7 +8,7 @@ public class sampleClient {
     {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",8191)
                 .usePlaintext()
-                .intercept(new sampleClientInterceptor())
+                .intercept( new sampleClientRespInterceptor(),new sampleClientInterceptor2(),new sampleClientInterceptor())
                 .build();
         sampleReqDS reqDS = sampleReqDS.newBuilder().setSerialNum(1)
                 .setReqItem("blades")
