@@ -8,6 +8,7 @@ public class sampleServiceImpl extends sampleQueryGrpc.sampleQueryImplBase {
 
         if(request.getSerialNum()==1)
         {
+            System.out.println("the commodity is"+request.getReqItem());
             successResponse sresp = successResponse.newBuilder().setStatus("in stock")
                     .setAckNum(100)
                     .build();
