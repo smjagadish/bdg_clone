@@ -7,9 +7,25 @@ import io.grpc.ServerInterceptors;
 
 import java.io.IOException;
 
+import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NettyServerBuilder;
+import nl.altindag.ssl.SSLFactory;
+import io.netty.handler.ssl.SslContext;
+import nl.altindag.ssl.util.NettySslUtils;
+
 public class sampleServer {
     public static void main(String[] args) throws IOException, InterruptedException {
-        Server server = ServerBuilder.forPort(8191).addService(ServerInterceptors.intercept(new sampleServiceImpl(), new sampleServerRespInterceptor(),new sampleServerInterceptor(),new sampleServerInterceptor2()))
+        SSLFactory sslFactory = SSLFactory.builder()
+                .withIdentityMaterial("keystore", "test123".toCharArray())
+                .withTrustMaterial("truststore", "test123".toCharArray())
+                .withNeedClientAuthentication()
+                .build();
+        SslContext sslContext = GrpcSslContexts.configure(NettySslUtils.forServer(sslFactory)).build();
+
+
+
+        Server server = NettyServerBuilder.forPort(8191).addService(ServerInterceptors.intercept(new sampleServiceImpl(), new sampleServerRespInterceptor(),new sampleServerInterceptor(),new sampleServerInterceptor2()))
+                .sslContext(sslContext)
                 .build();
 
         System.out.println("Starting server...");
