@@ -6,14 +6,12 @@ import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.rpc.ErrorInfo;
 import com.google.rpc.Status;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Metadata;
-import io.grpc.StatusRuntimeException;
+import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.protobuf.StatusProto;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class GrpcClient {
     public static void main(String[] args) throws InterruptedException, InvalidProtocolBufferException {
@@ -25,10 +23,17 @@ public class GrpcClient {
           = HelloServiceGrpc.newBlockingStub(channel);
 try {
     // below invocation will result in the server raising an exception without any metadata
-    HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
+    // snippet below shows the possibility to use a deadline (aka timeout) . server errors out on the rpc if it cannot respond within the deadline
+    // the deadline i believe is an app level construct . possible that the call completes quick in app but being buffered in netty or other lower layer
+    HelloResponse helloResponse = stub.withDeadlineAfter(1000,TimeUnit.MILLISECONDS).hello(HelloRequest.newBuilder()
             .setFirstName("Baeldung")
             .setLastName("gRPC")
             .build());
+
+    /* HelloResponse helloResponse = stub.withDeadlineAfter(1,TimeUnit.MILLISECONDS).hello(HelloRequest.newBuilder()
+            .setFirstName("Baeldung")
+            .setLastName("gRPC")
+            .build()); */
 
     System.out.println("Response received from server:\n" + helloResponse);
 

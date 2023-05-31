@@ -67,7 +67,7 @@ public class HelloServiceImpl extends HelloServiceImplBase {
 
         // google grpc error handling with custom metadata
 
-        if (request.getFirstName().equalsIgnoreCase("Big"))
+        else if (request.getFirstName().equalsIgnoreCase("Big"))
         {
             // needs a placeholder proto object to store the error info
             HelloError er = HelloError.newBuilder().setAddError("inner error").build();
@@ -81,7 +81,7 @@ public class HelloServiceImpl extends HelloServiceImplBase {
 
         // google grpc error handling with proprietary metadata
 
-        if(request.getFirstName().equalsIgnoreCase("Beg"))
+        else if(request.getFirstName().equalsIgnoreCase("Beg"))
         {
             // placeholder proto object built using the prop model
             ErrorInfo einfo = ErrorInfo.newBuilder()
@@ -96,7 +96,9 @@ public class HelloServiceImpl extends HelloServiceImplBase {
                     .build();
             responseObserver.onError(StatusProto.toStatusException(status));
         }
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+        else {
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
     }
 }
