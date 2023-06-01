@@ -9,6 +9,7 @@ import com.baeldung.grpc.errorhandling.AdditionalError;
 import com.google.protobuf.Any;
 import com.google.rpc.Code;
 import com.google.rpc.ErrorInfo;
+import io.grpc.Context;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.StatusProto;
@@ -32,12 +33,19 @@ public class HelloServiceImpl extends HelloServiceImplBase {
             .toString();
         boolean st = false;
 
-        HelloResponse response = HelloResponse.newBuilder()
-            .setGreeting(greeting)
-            .build();
+
 
         //  standard grpc error handling
+        // The client sets a deadline for this specific rpc call alone
+        // checking in server side if context is closed due to expired deadline so that we can avoid the processing
+        if (Context.current().isCancelled()) {
+            responseObserver.onError(Status.CANCELLED.withDescription("Cancelled by client").asRuntimeException());
+            return;
+        }
 
+        HelloResponse response = HelloResponse.newBuilder()
+                .setGreeting(greeting)
+                .build();
         if (request.getFirstName().equalsIgnoreCase("Baeldung"))
 {
 

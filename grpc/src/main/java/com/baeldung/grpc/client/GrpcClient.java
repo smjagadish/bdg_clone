@@ -25,7 +25,7 @@ try {
     // below invocation will result in the server raising an exception without any metadata
     // snippet below shows the possibility to use a deadline (aka timeout) . server errors out on the rpc if it cannot respond within the deadline
     // the deadline i believe is an app level construct . possible that the call completes quick in app but being buffered in netty or other lower layer
-    HelloResponse helloResponse = stub.withDeadlineAfter(1000,TimeUnit.MILLISECONDS).hello(HelloRequest.newBuilder()
+    HelloResponse helloResponse = stub.withDeadlineAfter(100,TimeUnit.MILLISECONDS).hello(HelloRequest.newBuilder()
             .setFirstName("Baeldung")
             .setLastName("gRPC")
             .build());
