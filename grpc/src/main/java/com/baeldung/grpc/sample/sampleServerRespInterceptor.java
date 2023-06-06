@@ -43,6 +43,7 @@ public class sampleServerRespInterceptor implements ServerInterceptor {
 
             @Override
             public void close(Status status, Metadata trailers) {
+                LOGGER.info("can i get this value"+ Constants.resp_token.get());
                 super.close(status, trailers);
             }
 

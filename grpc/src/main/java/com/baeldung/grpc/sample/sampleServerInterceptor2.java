@@ -1,9 +1,6 @@
 package com.baeldung.grpc.sample;
 
-import io.grpc.Metadata;
-import io.grpc.ServerCall;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
+import io.grpc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +13,10 @@ public class sampleServerInterceptor2 implements ServerInterceptor {
         System.out.println("second server interceptor and no modifications");
 
         headers.put(Metadata.Key.of("injected-key",Metadata.ASCII_STRING_MARSHALLER),"working");
-        return next.startCall(call, headers);
+        // retrieving context info set as MD in client side
+        String token = headers.get(Metadata.Key.of("auth_token", Metadata.ASCII_STRING_MARSHALLER));
+        Context ctx = Context.current().withValue(Constants.auth_token,token);
+        return Contexts.interceptCall(ctx,call,headers,next);
     }
 
 }

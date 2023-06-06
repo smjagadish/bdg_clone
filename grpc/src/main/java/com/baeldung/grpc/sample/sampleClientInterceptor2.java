@@ -12,6 +12,8 @@ public class sampleClientInterceptor2 implements ClientInterceptor {
                 System.out.println("second interception of client call to inject header");
 
                 headers.put(Metadata.Key.of("x-fwd-headers",Metadata.ASCII_STRING_MARSHALLER),"none");
+                //Retrieving ctx value
+                System.out.println("checking if i can get the context value");
                 super.start(responseListener, headers);
             }
         };

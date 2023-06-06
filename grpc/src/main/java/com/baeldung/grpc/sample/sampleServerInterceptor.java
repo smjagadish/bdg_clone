@@ -1,9 +1,6 @@
 package com.baeldung.grpc.sample;
 
-import io.grpc.Metadata;
-import io.grpc.ServerCall;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
+import io.grpc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -16,7 +13,11 @@ public class sampleServerInterceptor implements ServerInterceptor {
         LOGGER.info("inside server intercepto#1");
         System.out.println("first server interceptor and no modifications");
         MDC.clear();
+        // ctx retrieval . will not set again , but will check in impl
+        LOGGER.info("ctx retrieval in interceptor");
+        System.out.println((String)Constants.auth_token.get());
         return next.startCall(call,headers);
     }
+
 
 }

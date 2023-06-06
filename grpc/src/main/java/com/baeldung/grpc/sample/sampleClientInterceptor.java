@@ -11,6 +11,10 @@ public class sampleClientInterceptor implements ClientInterceptor {
             public void start(Listener<RespT> responseListener, Metadata headers) {
                 System.out.println("intercepting client call to inject header");
                 headers.put(Metadata.Key.of("auth_token",Metadata.ASCII_STRING_MARSHALLER),"fhskhfkshfkHjkzxchkhkjhc");
+                // Testing the context
+                Context ctx = Context.current().withValue(Context.key("temp"),"ctx value");
+                // looks like i cannot pass this context between interceptors and/or impl
+                // i must investigate this further , until then use metadata for populating header data
                 super.start(responseListener, headers);
             }
 

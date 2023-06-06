@@ -1,5 +1,6 @@
 package com.baeldung.grpc.sample;
 
+import io.grpc.Context;
 import io.grpc.ServerInterceptors;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -14,12 +15,16 @@ public class sampleServiceImpl extends sampleQueryGrpc.sampleQueryImplBase {
         if(request.getSerialNum()==1)
         {
             LOGGER.info("server main thread");
+            //context data retrieval and printing
+            String data = ((String)Constants.auth_token.get());
+            LOGGER.info("printing context set in interceptor"+" "+data);
             System.out.println("the commodity is"+request.getReqItem());
             successResponse sresp = successResponse.newBuilder().setStatus("in stock")
                     .setAckNum(100)
                     .build();
             sampleResDS resDS = sampleResDS.newBuilder().setSresp(sresp).build();
-
+            //context data population for usage in trailer
+            Context.current().withValue(Constants.resp_token,"qwertymaniac");
             responseObserver.onNext(resDS);
         }
         else
