@@ -17,6 +17,7 @@ public class GrpcClient {
     public static void main(String[] args) throws InterruptedException, InvalidProtocolBufferException {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
             .usePlaintext()
+            .proxyDetector(new myProxy())
             .build();
 
         HelloServiceGrpc.HelloServiceBlockingStub stub 
