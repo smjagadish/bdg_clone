@@ -24,7 +24,7 @@ public class sampleServer {
 
 
 
-        Server server = NettyServerBuilder.forPort(8191).addService(ServerInterceptors.intercept(new sampleServiceImpl(), new sampleServerRespInterceptor(),new sampleServerInterceptor(),new sampleServerInterceptor2()))
+        Server server = NettyServerBuilder.forPort(8191).addService(ServerInterceptors.intercept(new sampleServiceImpl(), new sampleServerEnInterceptor(),new sampleServerRespInterceptor(),new sampleServerInterceptor(),new sampleServerInterceptor2()))
                 .sslContext(sslContext)
                 .build();
 
