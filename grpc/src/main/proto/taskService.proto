@@ -1,0 +1,53 @@
+
+syntax = "proto3";
+
+import "taskExtn.proto";
+package task;
+
+option java_multiple_files = true;
+option java_package = "com.baeldung.grpc.task";
+option java_outer_classname = "taskServiceProto";
+
+service createTask {
+rpc unaryCreate (requestData) returns (responseData) {}
+rpc clientStream (stream requestData) returns (responseData) {}
+rpc serverStream (requestData) returns (stream responseData) {}
+rpc bidiStream (stream requestData) returns (stream responseData) {}
+}
+
+message requestData {
+  int32 taskID = 1;
+  string taskName = 2;
+  taskData tData = 3;
+}
+
+message taskData {
+  int32 taskPrio = 1;
+  string taskCategory = 2;
+}
+
+message responseData {
+  oneof res {
+    taskResponse tresp = 1;
+    errorResponse eresp = 2;
+  }
+}
+
+message taskResponse {
+  bool taskAdmit = 1;
+  string taskNotes = 2;
+  taskSupport extraData = 3;
+}
+
+message taskSupport {
+  string taskDescription = 1;
+  bool taskModification = 2;
+}
+
+message errorResponse {
+  string reason =1;
+}
+
+message customMessage {
+  option (taskExtn.timeout)  = 700;
+}

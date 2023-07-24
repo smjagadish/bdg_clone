@@ -3,9 +3,10 @@ package com.baeldung.grpc.sample;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.netty.GrpcSslContexts;
-import io.grpc.netty.NettyChannelBuilder;
-import io.netty.handler.ssl.SslContext;
+// comment out ssl
+//import io.grpc.netty.GrpcSslContexts;
+//import io.grpc.netty.NettyChannelBuilder;
+//import io.netty.handler.ssl.SslContext;
 import nl.altindag.ssl.SSLFactory;
 import nl.altindag.ssl.util.NettySslUtils;
 
@@ -15,16 +16,24 @@ import javax.net.ssl.SSLSession;
 
 public class sampleClient {
     public static void main(String[] args) throws SSLException {
-        SSLFactory sslFactory = SSLFactory.builder()
+
+       /* SSLFactory sslFactory = SSLFactory.builder()
                 .withIdentityMaterial("keystore", "test123".toCharArray())
                 .withTrustMaterial("truststore", "test123".toCharArray())
 
                 .build();
-        SslContext sslContext = GrpcSslContexts.configure(NettySslUtils.forClient(sslFactory)).build();
+        SslContext sslContext = GrpcSslContexts.configure(NettySslUtils.forClient(sslFactory)).build(); */
 
-        ManagedChannel channel = NettyChannelBuilder.forAddress("localhost",8191)
+// investigate -> ssl client doesnt work in new setup
+        /*ManagedChannel channel = NettyChannelBuilder.forAddress("localhost",8191)
                 .intercept( new sampleClientRespInterceptor(),new sampleClientInterceptor2(),new sampleClientInterceptor())
                 .sslContext(sslContext)
+                .build();
+        */
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",8152)
+                .intercept( new sampleClientRespInterceptor(),new sampleClientInterceptor2(),new sampleClientInterceptor())
+                .usePlaintext()
                 .build();
         sampleReqDS reqDS = sampleReqDS.newBuilder().setSerialNum(1)
                 .setReqItem("blades")
