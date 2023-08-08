@@ -2,6 +2,8 @@
 syntax = "proto3";
 
 import "taskExtn.proto";
+import "google/protobuf/descriptor.proto";
+
 package task;
 
 option java_multiple_files = true;
@@ -48,6 +50,6 @@ message errorResponse {
   string reason =1;
 }
 
-message customMessage {
-  option (taskExtn.timeout)  = 700;
+message cMessage {
+  option (taskExtn.timeout) = 800;
 }

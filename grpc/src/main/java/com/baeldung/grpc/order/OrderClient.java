@@ -54,6 +54,7 @@ finishLatch.countDown();
 finishLatch.countDown();
             }
         };
+
         StreamObserver<Order > requestObserver = asyncStub.clientSideStreamingCreateOrders(respObserver);
         try
         {
