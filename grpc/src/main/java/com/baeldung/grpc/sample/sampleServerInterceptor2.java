@@ -9,14 +9,21 @@ public class sampleServerInterceptor2 implements ServerInterceptor {
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
-        LOGGER.info("inside server interceptor #2");
-        System.out.println("second server interceptor and no modifications");
-
-        headers.put(Metadata.Key.of("injected-key",Metadata.ASCII_STRING_MARSHALLER),"working");
-        // retrieving context info set as MD in client side
-        String token = headers.get(Metadata.Key.of("auth_token", Metadata.ASCII_STRING_MARSHALLER));
-        Context ctx = Context.current().withValue(Constants.auth_token,token);
-        return Contexts.interceptCall(ctx,call,headers,next);
+        Context prev = null;
+        try {
+            LOGGER.info("inside server interceptor #2");
+            System.out.println("second server interceptor and no modifications");
+            prev = Context.current().attach();
+            headers.put(Metadata.Key.of("injected-key", Metadata.ASCII_STRING_MARSHALLER), "working");
+            // retrieving context info set as MD in client side
+            String token = headers.get(Metadata.Key.of("auth_token", Metadata.ASCII_STRING_MARSHALLER));
+            LOGGER.info("value is:" + token);
+            Context ctx = Context.current().withValue(Constants.auth_token, token);
+            return Contexts.interceptCall(ctx, call, headers, next);
+        } finally {
+            if(prev!=null)
+                prev.detach(prev);
+        }
     }
 
 }

@@ -30,7 +30,7 @@ public class OrderClient {
             System.out.println("info:"+" "+obj.getInfo().getPromoCode()+" "+obj.getInfo().getInDemand());
         }
         // client side streaming
-        Order cord = Order.newBuilder().setProductCode("TG76G").setProductName("Router-AL").setProductQty(100).setPrice(128.56)
+        Order cord = Order.newBuilder().setProductName("Router-AL").setProductQty(100).setPrice(128.56).setProductCode("TG76G")
                 .setProductInfo(info.newBuilder().setProductType("switch gear").setProductBatch("YHG6T").build()).build();
         final CountDownLatch finishLatch = new CountDownLatch(1);
 

@@ -17,6 +17,8 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HelloServiceImpl extends HelloServiceImplBase {
 
@@ -33,12 +35,26 @@ public class HelloServiceImpl extends HelloServiceImplBase {
             .toString();
         boolean st = false;
 
+             Context.CancellableContext cctx = Context.current().withCancellation();
+             cctx.addListener(new Context.CancellationListener() {
+                 @Override
+                 public void cancelled(Context context) {
 
+                 }
+             }, Executors.newCachedThreadPool());
 
         //  standard grpc error handling
         // The client sets a deadline for this specific rpc call alone
         // checking in server side if context is closed due to expired deadline so that we can avoid the processing
+        try {
+            Thread.sleep(2500);
+        }
+        catch (Exception e)
+        {
+
+        }
         if (Context.current().isCancelled()) {
+            System.out.println("ctx cancelled already ");
             responseObserver.onError(Status.CANCELLED.withDescription("Cancelled by client").asRuntimeException());
             return;
         }

@@ -52,6 +52,12 @@ public class taskServiceImpl extends createTaskGrpc.createTaskImplBase {
                 // statically successful now , will be modified later
                 responseData resp = responseData.newBuilder().setTresp(tResp).build();
                 // stream ends
+                // remove later - delay for otel
+                try {
+                    Thread.sleep(200000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 responseObserver.onNext(resp);
                 responseObserver.onCompleted();
             }
@@ -79,13 +85,24 @@ public class taskServiceImpl extends createTaskGrpc.createTaskImplBase {
 
     @Override
     public StreamObserver<requestData> bidiStream(StreamObserver<responseData> responseObserver) {
-        logger.info("client side streaming");
+        logger.info("bidirectional side streaming");
         return new StreamObserver<requestData>() {
             @Override
             public void onNext(requestData value) {
-                logger.info("parsing the client stream");
+                logger.info("parsing the bidirectional stream");
                 logger.info("recieved info" + " - " + "taskid:" + value.getTaskID() + "task_name:" + value.getTaskName());
                 logger.info("parsed and will pick next stream");
+                logger.info("server is now responding to client stream");
+                // success case
+                taskResponse tResp = taskResponse.newBuilder()
+                        .setTaskAdmit(true)
+                        .setTaskNotes("requested task is created")
+                        .setExtraData(taskSupport.newBuilder().setTaskDescription(" a bidi stream task response object for successful case").setTaskModification(true).build())
+                        .build();
+                // statically successful now , will be modified later
+                responseData resp = responseData.newBuilder().setTresp(tResp).build();
+                // stream still continues
+                responseObserver.onNext(resp);
 
             }
 
@@ -97,17 +114,7 @@ public class taskServiceImpl extends createTaskGrpc.createTaskImplBase {
 
             @Override
             public void onCompleted() {
-                logger.info("server is now responding to client stream");
-                // success case
-                taskResponse tResp = taskResponse.newBuilder()
-                        .setTaskAdmit(true)
-                        .setTaskNotes("requested task is created")
-                        .setExtraData(taskSupport.newBuilder().setTaskDescription(" a server stream task response object for successful case").setTaskModification(true).build())
-                        .build();
-                // statically successful now , will be modified later
-                responseData resp = responseData.newBuilder().setTresp(tResp).build();
-                // stream ends
-                responseObserver.onNext(resp);
+                logger.info("bidirectional stream closure initiated ");
                 responseObserver.onCompleted();
             }
         };

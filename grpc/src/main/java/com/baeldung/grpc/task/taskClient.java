@@ -18,6 +18,7 @@ public class taskClient {
     public static void main(String[] args) throws InterruptedException {
         callBack cb = new callBack();
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8787)
+                .intercept(new taskClientInterceptor(),new taskClientMsgInterceptor())
                 .usePlaintext()
                 .build();
         createTaskGrpc.createTaskBlockingStub stub = createTaskGrpc.newBlockingStub(channel);
@@ -70,7 +71,7 @@ public class taskClient {
                         .setTaskName("client streaming in async stub")
                         .setTData(taskData.newBuilder().setTaskPrio(1).setTaskCategory("client_stream").build())
                         .build();
-                Thread.sleep(10000);
+                Thread.sleep(1000);
                 req.onNext(reqdata);
             }
             req.onCompleted();
@@ -80,7 +81,30 @@ public class taskClient {
             counter.countDown();
         }
 
-        counter.await(200, TimeUnit.SECONDS);
+        counter.await(600, TimeUnit.SECONDS);
+        final CountDownLatch bidi_counter = new CountDownLatch(1);
+      StreamObserver<requestData> bidires = asyncstub.bidiStream(new bidiStreamResp(bidi_counter));
+        try {
+            for (int i=0;i <10 ; i++) {
+                if(bidi_counter.getCount() ==0)
+                    return;
+                else {
+                    requestData bididata = requestData.newBuilder()
+                            .setTaskID(4985)
+                            .setTaskName("bidi streaming in async stub")
+                            .setTData(taskData.newBuilder().setTaskPrio(1).setTaskCategory("bidi_stream").build())
+                            .build();
+                    Thread.sleep(1000);
+                    bidires.onNext(bididata);
+                }
+            }
+            bidires.onCompleted();
+        }
+        catch (RuntimeException e)
+        {
+            bidi_counter.countDown();
+        }
+        bidi_counter.await(300, TimeUnit.SECONDS);
         channel.shutdown();
     }
 }
